@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "venkat79814@gmail.com" && request.auth.token.email_verified == true));
+    }
+    function isRecruiter() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'recruiter';
+    }
+
+    // User Profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isAdmin();
+    }
+
+    // Jobs
+    match /jobs/{jobId} {
+      allow read: if isAuthenticated();
+      allow create: if isRecruiter() || isAdmin();
+      allow update, delete: if (isAuthenticated() && resource.data.recruiterId == request.auth.uid) || isAdmin();
+    }
+
+    // Applications
+    match /applications/{applicationId} {
+      allow read: if isAuthenticated() && (resource.data.studentId == request.auth.uid || resource.data.recruiterId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated();
+      allow update: if (isAuthenticated() && (resource.data.studentId == request.auth.uid || resource.data.recruiterId == request.auth.uid)) || isAdmin();
+    }
+  }
+}

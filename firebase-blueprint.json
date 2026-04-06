@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Base user profile information.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["student", "recruiter", "admin"] },
+        "displayName": { "type": "string" },
+        "isVerified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "displayName", "isVerified", "createdAt"]
+    },
+    "StudentProfile": {
+      "title": "Student Profile",
+      "description": "Student-specific profile information.",
+      "type": "object",
+      "properties": {
+        "skills": { "type": "array", "items": { "type": "string" } },
+        "education": { "type": "string" },
+        "resumeUrl": { "type": "string" },
+        "interests": { "type": "array", "items": { "type": "string" } },
+        "phone": { "type": "string" }
+      }
+    },
+    "RecruiterProfile": {
+      "title": "Recruiter Profile",
+      "description": "Recruiter-specific profile information.",
+      "type": "object",
+      "properties": {
+        "companyName": { "type": "string" },
+        "cin": { "type": "string" },
+        "phone": { "type": "string" }
+      }
+    },
+    "Job": {
+      "title": "Job Posting",
+      "description": "Details of a job posting.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "recruiterId": { "type": "string" },
+        "companyName": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "skillsRequired": { "type": "array", "items": { "type": "string" } },
+        "salary": { "type": "string" },
+        "location": { "type": "string" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["open", "closed"] }
+      }
+    },
+    "Application": {
+      "title": "Job Application",
+      "description": "Details of a job application.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "jobId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "status": { "type": "string", "enum": ["applied", "shortlisted", "rejected", "selected"] },
+        "appliedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents."
+    },
+    "/jobs/{jobId}": {
+      "schema": "Job",
+      "description": "Job posting documents."
+    },
+    "/applications/{applicationId}": {
+      "schema": "Application",
+      "description": "Job application documents."
+    }
+  }
+}
